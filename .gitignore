@@ -1,0 +1,5 @@
+.idea/
+Runtime/*
+!App/Runtime/index.html
+Upload/*
+!Upload/index.html

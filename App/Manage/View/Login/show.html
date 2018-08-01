@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Login - XY</title>
+    <link rel="icon" href="__PUBLIC__/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/login/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/login/css/demo.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/login/css/component.css" />
+    <link rel="stylesheet" href="__PUBLIC__/layui/css/layui.css">
+    <style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    div {
+        background-color: transparent;
+    }
+
+    form {
+        margin: 16px auto;
+    }
+    /*.manage-login{
+            margin: 200px auto;
+            padding: 16px;
+            width: 500px;
+            box-shadow: 1px 1px 10px 10px #ccc;
+        }*/
+    /*.layui-input-block {
+            margin-left: 60px;
+            margin-right: 60px;
+        }
+        .login-btn button{
+            width: 100%;
+        }*/
+    </style>
+</head>
+
+<body class="large-header" id="large-header">
+    <div class="container demo-1">
+        <div class="content">
+            <div id="large-header" class="large-header">
+                <canvas id="demo-canvas"></canvas>
+                <div class="manage-login layui-anim layui-anim-scaleSpring logo_box">
+                    <div class="layui-field-box logo_box">
+                        <h3>欢迎你</h3>
+                        <form class="layui-form">
+                            <div class="input_outer">
+                                <span class="u_user"></span>
+                                <input name="name" class="text" style="color: #FFFFFF !important" type="text" placeholder="请输入账户" autocomplete="off">
+                            </div>
+                            <div class="input_outer">
+                                <span class="us_uer"></span>
+                                <input name="password" class="text" style="color: #FFFFFF !important; position:absolute; z-index:100;" value="" type="password" placeholder="请输入密码" autocomplete="off">
+                            </div>
+                            <div class="mb2">
+                                <a id="sub" lay-submit lay-filter="login" class="act-but submit" href="javascript:;" style="color: #FFFFFF">登录</a>
+                            </div>
+                            <!-- <div class="layui-input-block">
+                                <input type="text" name="name" required lay-verify="required" placeholder="账户" autocomplete="off" class="layui-input" autofocus="autofocus">
+                            </div>
+                            <br>
+                            <div class="layui-input-block">
+                                <input type="password" name="password" required lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input">
+                            </div>
+                            <br>
+                            <div class="layui-input-block login-btn">
+                                <button lay-submit lay-filter="login" class="layui-btn">登录</button>
+                            </div> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="__PUBLIC__/layui/layui.js"></script>
+    <script src="__PUBLIC__/login/js/TweenLite.min.js"></script>
+    <script src="__PUBLIC__/login/js/EasePack.min.js"></script>
+    <script src="__PUBLIC__/login/js/rAF.js"></script>
+    <script src="__PUBLIC__/login/js/demo-1.js"></script>
+    <script type="text/javascript">
+    layui.use(['form', 'layer', 'jquery'], function() {
+
+        // 操作对象
+        var form = layui.form;
+        var $ = layui.jquery;
+        form.on('submit(login)', function(data) {
+            // console.log(data.field);
+            $.ajax({
+                url: '/dologin',
+                data: data.field,
+                dataType: 'json',
+                type: 'post',
+                success: function(data) {
+                    if (data.status == true) {
+                        location.href = "/";
+                    } else {
+                        layer.alert(data.msg);
+                    }
+                }
+            })
+            return false;
+        })
+
+        $("input").on('keydown', function(e){  //document为当前元素，限制范围，如果不限制的话会一直有事件
+            if(e.keyCode == 13){
+                $("#sub").click();
+            }
+        })
+
+    });
+    </script>
+</body>
+
+</html>

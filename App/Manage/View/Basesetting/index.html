@@ -1,0 +1,59 @@
+<extend name="Common@Manage:main"/>
+
+<block name="content">
+
+    <style>
+        .layui-input-mydefault{
+            border: none;
+            cursor: pointer;
+            color: #c1c1c1;
+        }
+        .layui-form-label{
+            cursor: default;
+        }
+    </style>
+
+    <blockquote class="layui-elem-quote">
+        基本配置
+    </blockquote>
+
+    <div class="layui-card">
+        <form class="layui-form" action="/basesetting" method="POST">
+            <div class="layui-card-body">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站标题 :</label>
+                    <div class="layui-input-block">
+                        <input value="{$info.title}" type="text" name="title" autocomplete="off" placeholder="请输入网站标题" class="layui-input layui-input-mydefault">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">网站名称 :</label>
+                    <div class="layui-input-block">
+                        <input value="{$info.site_name}" type="text" name="site_name" autocomplete="off" placeholder="请输入网站名称" class="layui-input layui-input-mydefault">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">底部描述 :</label>
+                    <div class="layui-input-block">
+                        <input value="{$info.footer_text}" type="text" name="footer_text" autocomplete="off" placeholder="请输入底部描述" class="layui-input layui-input-mydefault">
+                    </div>
+                </div>
+                <div style="width: 216px; margin-left: 30px;">
+                    <input type="hidden" name="id" value="{$info.id}">
+                    <button class="layui-btn layui-btn-fluid">保存修改</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $('.layui-input-mydefault').focus(function () {
+            $(this).removeClass('layui-input-mydefault');
+        }).blur(function () {
+            $(this).addClass('layui-input-mydefault');
+            // 如果需要失焦后自动更新,写在这里即可.
+        })
+    </script>
+
+</block>

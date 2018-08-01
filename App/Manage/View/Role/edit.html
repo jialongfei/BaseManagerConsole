@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="icon" href="__PUBLIC__/favicon.ico">
+    <link rel="stylesheet" href="__PUBLIC__/layui/css/layui.css">
+    <link rel="stylesheet" href="__PUBLIC__/manage/css/common.css">
+    <!-- 此文件必须在layui.css之后引用 -->
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+    <script src="__PUBLIC__/layui/layui.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <!--<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>-->
+    <style>
+    .layui-form-item {
+        margin: 16px auto;
+    }
+    .smartcheckedPart {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="x-body">
+        <form id="form" class="layui-form">
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">角色信息</li>
+                    <li>权限分配</li>
+                </ul>
+                <div class="layui-tab-content" style="height: 100px;">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-item">
+                            <label for="name" class="layui-form-label"><span class="m-warning">*</span> 角色名称</label>
+                            <div class="layui-input-inline">
+                                <input value="{$info.name}" type="text" id="name" name="name" required="" lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="layui-form-item">
+                            <label for="desc" class="layui-form-label">角色描述</label>
+                            <div class="layui-input-inline">
+                                <input value="{$info.desc}" type="text" id="desc" name="desc" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="status" class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" id="status" name="status" lay-skin="switch" lay-text="ON|OFF" <if condition="$info['status'] == 1">checked</if> >
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"> </label>
+                            <div class="layui-input-inline">
+                                <input type="hidden" name="id" id="role_id" value="{$info.id}">
+                                <button class="layui-btn w-auto" lay-filter="*" lay-submit="">修改</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item" style="position: relative;">
+                        <div class="layui-form-item">
+                            <div class="layui-input-block" style="margin-left: 30px;">
+                                <div class="block" v-for="I in treedata">
+                                    <input type="checkbox" lay-filter="premission" name="premission[]" :title="I.name" :value="I.id" :s="I.is_checked" v-model="I.is_checked == '1'">
+                                    <div class="block" v-for="II in I.children" style="margin-left: 40px;">
+                                        <input type="checkbox" lay-filter="premission" name="premission[]" :title="II.name" :value="II.id" v-model="II.is_checked == '1'">
+                                        <div class="block" v-for="III in II.children" style="margin-left: 60px;">
+                                            <input type="checkbox" lay-filter="premission" name="premission[]" :title="III.name" :value="III.id" v-model="III.is_checked == '1'">
+                                            <div class="block" v-for="IV in III.children" style="margin-left: 60px;">
+                                                <input type="checkbox" lay-filter="premission" name="premission[]" :title="IV.name" :value="IV.id" v-model="IV.is_checked == '1'">
+                                                <div class="block" v-for="V in IV.children" style="margin-left: 60px;">
+                                                    <input type="checkbox" lay-filter="premission" name="premission[]" :title="V.name" :value="V.id" v-model="V.is_checked == '1'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="smartcheckedPart">
+                            <label for="smartchecked" class="layui-form-label">智能勾选</label>
+                            <input type="checkbox" id="smartchecked" name="smartchecked" lay-skin="switch" lay-text="开启|关闭">
+                        </div>
+                    </div>
+                    <!-- TODO 2 如果提交按钮需要提取到外面 打开下面的注释 -->
+                    <!--<div class="layui-form-item">-->
+                    <!--<label class="layui-form-label"> </label>-->
+                    <!--<div class="layui-input-inline">-->
+                    <!--<button  class="layui-btn w-auto" lay-filter="*" lay-submit="">添加</button>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+    var form = new Vue({
+        el: "#form",
+        data: {
+            treedata: {},
+            crrequest:{
+                type:"",
+                pre_id:"",
+                role_id:""
+            }
+        },
+        methods:{
+            changeRole(){
+                var _data = this.crrequest;
+                console.log("xxx",this.crrequest);
+                $.ajax({
+                    url: "/role/bind/pre",
+                    type: "post",
+                    data:_data,
+                    dataType: 'JSON',
+                    success: function(res) {
+                        console.log("xxx",res);
+                    }
+                });
+            }
+        },
+        mounted: function() {
+            this.crrequest.role_id = $("#role_id").val();
+            var _this = this;
+            $.ajax({
+                url: "/pretree/api?role_id="+$("#role_id").val(),
+                type: "get",
+                success: function(res) {
+                    if (res.status) {
+                        _this.treedata = res.data;
+
+                        _this.$nextTick(function() {
+
+                            layui.use(['form', 'layer', 'element'], function() {
+                                $ = layui.jquery;
+                                var form = layui.form,
+                                    layer = layui.layer,
+                                    element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+                                // 自定义验证规则
+                                form.verify({
+                                    nikename: function(value) {
+                                        if (value.length < 5) {
+                                            return '角色名的长度不可小于5个字符';
+                                        }
+                                    }
+                                });
+
+                                // 监听提交
+                                form.on('submit(*)', function(data) {
+                                    // 格式化状态字段的值
+                                    if (data.field.status == 'on') { data.field.status = 1; } else { data.field.status = 0; }
+
+                                    // JS 提交表单
+                                    $.ajax({
+                                        url: "/role/edit",
+                                        data: data.field,
+                                        dataType: 'JSON',
+                                        type: 'POST',
+                                        success: function(data) {
+                                            if (data.status == true) {
+                                                layer.alert("修改成功 !", { icon: 6 }, function() {
+                                                    // 获得frame索引
+                                                    var index = parent.layer.getFrameIndex(window.name);
+                                                    // 关闭当前frame
+                                                    parent.layer.close(index);
+                                                });
+                                            } else {
+                                                layer.alert("修改失败 : " + data.msg, { icon: 2 });
+                                            }
+                                        }
+                                    });
+
+                                    return false;
+                                });
+
+                                //监听复选框事件
+                                form.on('checkbox(premission)', function(data) {
+                                    data.elem.checked ? _this.crrequest.type = 'add' :  _this.crrequest.type = 'del'
+                                    var _temp = [];
+                                    _temp.push(data.value);
+                                    //判断是否开启智能勾选
+                                    if ($("#smartchecked").prop("checked")) {
+                                        //子级全部选中
+                                        if (data.elem.checked) {
+                                            $(data.elem).parent().find("input[type='checkbox']").prop('checked', true);
+                                        }
+                                        //子级全部不选中
+                                        else {
+                                            $(data.elem).parent().find("input[type='checkbox']").prop('checked', false);
+                                        }
+                                        form.render('checkbox');
+
+                                        $(data.elem).parent().find("input[type='checkbox']").each(function(){
+                                            _temp.push($(this).val());
+                                        })
+                                    }
+                                    _this.crrequest.pre_id = _temp;
+                                    _this.changeRole();
+                                });
+
+
+                            });
+                        });
+                    }
+                }
+            })
+        }
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+<extend name="Common@Manage:main"/>
+<block name="content">
+    <style>
+        #tool_bar{
+            display: none;
+        }
+        #tool_bar a{
+            margin-left: 10px;
+        }
+    </style>
+    <!-- 顶部 -->
+    <blockquote class="layui-elem-quote" style="padding: 10px;">
+        <div class="layui-row">
+            <!-- 添加 -->
+            <div class="layui-col-md9">
+                <div class="layui-inline" style="line-height: 32px;"> <button class="layui-btn layui-btn-sm" onclick="showBox('新增角色','/role/create',50,70)"><i class="layui-icon">&#xe608;</i> 新增角色</button> </div>
+                <!-- 操作工具栏 -->
+                <div id="tool_bar" class="layui-inline">
+                    <a id="edit" href="javascript:;">编辑</a>
+                    <a class="change_role_status" id="status2true" href="javascript:;">激活</a>
+                    <a class="change_role_status" id="status2false" href="javascript:;">禁用</a>
+                    <a id="del" href="javascript:;">删除</a>
+                </div>
+            </div>
+            <!-- 搜索 -->
+            <div class="layui-col-md3" style="text-align: right;">
+                <div id="table_search" class="">
+                    <div class="layui-inline">
+                        <input class="layui-input search-input" placeholder="请输入角色名称" name="name" id="search_key" autocomplete="off">
+                    </div>
+                    <button class="layui-btn layui-btn-sm" data-type="reload">搜索</button>
+                </div>
+            </div>
+        </div>
+    </blockquote>
+
+    <table id="lists" lay-filter="data"></table>
+    <!-- 隐藏域 用于暂存要编辑和删除的数据ids -->
+    <input type="hidden" id="check_ids">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+
+            layui.use(['table','layer'], function(){
+                var table = layui.table,
+                    layer = layui.layer;
+                // 表格实例
+                table.render({
+                    elem: '#lists',// DOM ID
+                    url: '/role/search',// 数据接口
+                    page: true,// 开启分页
+                    cols: [[ // 表头 (列显示)
+                        {type:'checkbox',fixed: 'left'},
+                        // {field: 'id', title: 'ID', sort: true},
+                        {field: 'name', title: '角色名称'},
+                        {field: 'desc', title: '角色描述'},
+                        {field: 'create_user_name', title: '创建人'},
+                        {field: 'create_time', title: '创建时间'},
+                        {field: 'status', title: '状态', sort: true,fixed: 'right',templet: '#status'}
+                    ]],
+                    id:'lists',// 起别名 (方便表格重载)
+                    text: {
+                        none: '暂无相关数据' // 默认：无数据
+                    }
+                });
+                // 表格重载 条件搜索
+                var $ = layui.$,active = {
+                    reload: function(){
+                        var search_key = $('#search_key');
+                        //执行重载
+                        table.reload('lists', {
+                            page: {
+                                curr: 1 // 重新从第 1 页开始
+                            },
+                            where: {
+                                search_key: search_key.val(),// 搜索条件
+                            }
+                        });
+                    }
+                };
+                // 点击搜索按钮触发表格重载事件
+                $('#table_search .layui-btn').on('click', function(){
+                    var type = $(this).data('type');
+                    active[type] ? active[type].call(this) : '';
+                });
+                // 搜索框添加回车搜索事件
+                $("#search_key").keyup(function (e) {
+                    var curKey = e.which;
+                    if (curKey == 13) {
+                        var type = $('#table_search .layui-btn').data('type');
+                        active[type] ? active[type].call(this) : '';
+                    }
+                });
+                // -------------------- 数据操作 --------------------
+                // 监听表格复选框选择
+                table.on('checkbox(data)', function(obj){
+                    // console.log(obj)
+                    // 获取当前选中元素
+                    var checkStatus = table.checkStatus('lists')
+                        ,data = checkStatus.data;
+
+                    // 如果选中
+                    if(data.length > 0){
+                        // 选中数量不为空,则显示操作工具栏
+                        $('#tool_bar').css("display","inline-block");
+                        $('#edit').show();// 显示编辑按钮
+                        // 选中多个,则隐藏编辑按钮
+                        if(data.length > 1){$('#edit').hide();}
+                        // 声明暂存当前选中元素 ids 的变量
+                        var ids = '';
+                        // 拼接选中的ids
+                        for (var i=0;i<data.length;i++) {ids += ',' + data[i].id;}
+                        // 将当前选中元素的 id 暂存在隐藏域中
+                        $('#check_ids').val(ids);
+                    }else{
+                        $('#check_ids').val('');// 清空暂存的ids
+                        $('#tool_bar').hide();// 隐藏操作工具栏
+                    }
+                });
+                // 编辑事件
+                $('#edit').click(function () {
+
+                    // 获取当前选中数据的ids
+                    var edit_id = $('#check_ids').val();
+
+                    // 弹出编辑页面
+                    showBox('编辑','/role/edit?id='+edit_id,50,70);
+
+                });
+                // 删除事件
+                $('#del').click(function () {
+
+                    // 确认框
+                    layer.confirm("确认要删除吗，删除后不能恢复!", { title: "提示:",icon: 0 }, function (index) {
+                        layer.close(index);
+
+                        // 获取当前选中数据的ids
+                        var del_ids = $('#check_ids').val();
+
+                        // 发起请求
+                        $.ajax({
+                            type:"POST",
+                            url:"/role/delete",
+                            dataType:'JSON',
+                            data:{
+                                ids:del_ids,
+                            },
+                            success:function (res) {
+                                if (res.status == 1) {
+                                    layer.alert('删除成功!');
+                                }else{
+                                    layer.alert(res.msg);
+                                }
+                            }
+                        });
+                    });
+
+                });
+
+                // 修改状态
+                $('.change_role_status').click(function () {
+
+                    var send_data = {};
+
+                    if ($(this).attr("id") == 'status2true'){
+                        send_data.target_status = 1;
+                    }
+
+                    // 获取当前选中数据的ids
+                    var del_ids = $('#check_ids').val();
+                    send_data.ids = del_ids;
+
+                    // 发起请求
+                    $.ajax({
+                        type:"POST",
+                        url:"/role/changestatus",
+                        dataType:'JSON',
+                        data:send_data,
+                        success:function (res) {
+                            if (res.status == 1) {
+                                layer.alert('修改成功!');
+                            }else{
+                                layer.alert(res.msg);
+                            }
+                        }
+                    });
+
+                });
+
+            });
+            // out code...
+
+        });
+    </script>
+
+    <!-- 状态模板 -->
+    <script type="text/html" id="status">
+        {{#  if(d.status == 1){ }}
+        <font class="status_true">开启</font>
+        {{#  } else { }}
+        <font class="status_false">禁用</font>
+        {{#  } }}
+    </script>
+
+</block>

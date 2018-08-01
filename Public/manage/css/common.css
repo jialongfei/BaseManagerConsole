@@ -1,0 +1,38 @@
+.xy_body {
+    padding: 15px;
+}
+
+.search-input {
+    height: 32px;
+    line-height: 1.2;
+}
+
+.m-warning{
+    color: red;
+    vertical-align: sub;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.status_true{
+    color: #009E94;
+}
+
+.status_false{
+    color: #C54D54;
+}
+
+.nav_show{
+    color: #009E94;
+}
+
+.nav_hide{
+    color: #ccc;
+}
+
+.w-auto{
+    display: block;
+    width: 100%;
+}

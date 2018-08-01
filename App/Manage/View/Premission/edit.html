@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="icon" href="__PUBLIC__/favicon.ico">
+    <link rel="stylesheet" href="__PUBLIC__/layui/css/layui.css">
+    <link rel="stylesheet" href="__PUBLIC__/manage/css/common.css"><!-- 此文件必须在layui.css之后引用 -->
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+    <script src="__PUBLIC__/layui/layui.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <!--<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>-->
+    <style>
+        .layui-form-item{
+            margin: 16px 0 0 60px;
+        }
+        /**treeselect*/
+        .layui-form-select .layui-tree {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 42px;
+            padding: 5px 0;
+            z-index: 999;
+            min-width: 100%;
+            border: 1px solid #d2d2d2;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.12);
+            box-sizing: border-box;
+        }
+        .layui-form-selected .layui-tree {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+<div class="x-body">
+    <form id="form" class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">父权限</label>
+            <div class="layui-input-inline">
+                <input type="text" id="treeselecttest" lay-filter="demo" placeholder="模块/权限" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="name" class="layui-form-label"><span class="m-warning">*</span> 权限名称</label>
+            <div class="layui-input-inline">
+                <input value="{$info.name}" type="text" id="name" name="name" required="" lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <hr>
+        <div class="layui-form-item">
+            <label for="uri" class="layui-form-label">路由名称</label>
+            <div class="layui-input-inline">
+                <input value="{$info.uri}" type="text" id="uri" name="uri" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="is_nav" class="layui-form-label">是否导航</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" id="is_nav" name="is_nav" lay-skin="switch" lay-text="ON|OFF" <if condition="$info['is_nav'] == 1">checked</if>>
+            </div>
+        </div>
+        <br><br>
+        <div class="text-center">
+            <input type="hidden" name="id" id="infoid" value="{$info.id}">
+            <button  class="layui-btn" lay-filter="*" lay-submit="">修改</button>
+        </div>
+    </form>
+</div>
+<script>
+     var form = new Vue({
+        el: "#form",
+        data: {
+            treedata:{}
+        },
+        mounted:function(){
+            var _this = this;
+            $.ajax({
+                url:"/pretree/api?pre_id="+$("#infoid").val(),
+                type:"get",
+                success:function(res){
+                    if (res.status) {
+                        _this.treedata = res.data;
+
+                        layui.config({
+                          base: '/Public/layui/lay/modules/' //假设这是你存放拓展模块的根目录
+                        }).extend({ //设定模块别名
+                            mymod: 'treeSelect' //如果 mymod.js 是在根目录，也可以不用设定别名
+                            ,mod1: 'treeSelect' //相对于上述 base 目录的子目录
+                        });
+
+
+                        layui.use(['treeselect'],function () {
+                            treeselect = layui.treeselect;
+                            treeselect.render(
+                            {
+                                elem: "#treeselecttest",
+                                data: res.data
+                            });
+                            $("#selecttree_treeselecttest_text").val(res.is_checked.name)
+                            $("#treeselecttest").val(res.is_checked.id)
+                        });
+
+
+                        layui.use(['form','layer'], function(){
+                        $ = layui.jquery;
+                        var form = layui.form
+                            ,layer = layui.layer;
+
+                        // 自定义验证规则
+                        form.verify({
+                            nikename: function(value){
+                                if(value.length < 5){
+                                    return '权限名的长度不可小于5个字符';
+                                }
+                            }
+                        });
+
+                        // 监听提交
+                        form.on('submit(*)', function(data){
+                            // 格式化状态字段的值
+                            if (data.field.is_nav == 'on'){data.field.is_nav = 1;}else{data.field.is_nav = 0;}
+                            data.field["pid"] = $("#treeselecttest").val();
+
+                            // JS 提交表单
+                            $.ajax({
+                                url:"/premission/edit",
+                                data:data.field,
+                                dataType:'JSON',
+                                type:'POST',
+                                success:function(data){
+                                    if( data.status == true )
+                                    {
+                                        layer.alert("修改成功 !", {icon: 6},function () {
+                                            // 获得frame索引
+                                            var index = parent.layer.getFrameIndex(window.name);
+                                            // 关闭当前frame
+                                            parent.layer.close(index);
+                                        });
+                                    } else {
+                                        layer.alert("修改失败 : "+ data.msg, {icon: 2});
+                                    }
+                                }
+                            });
+
+                            return false;
+                        });
+
+
+                    });
+                    }
+                }
+            })
+        }
+    });
+    
+</script>
+</body>
+
+</html>

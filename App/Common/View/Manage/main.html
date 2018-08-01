@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{$site_info.title}</title>
+    <link rel="icon" href="__PUBLIC__/favicon.ico">
+    <link rel="stylesheet" href="__PUBLIC__/layui/css/layui.css">
+    <link rel="stylesheet" href="__PUBLIC__/manage/css/common.css"><!-- 此文件必须在layui.css之后引用 -->
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+
+    <!-- header -->
+    <div class="layui-header">
+        <div class="layui-logo"><a href="/" class="layui-logo">{$site_info.site_name}</a></div>
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="/">控制台</a></li>
+            <!--<li class="layui-nav-item">-->
+                <!--<a href="javascript:;">其他</a>-->
+                <!--<dl class="layui-nav-child">-->
+                    <!--<dd><a href="">测试1</a></dd>-->
+                    <!--<dd><a href="">测试2</a></dd>-->
+                    <!--<dd><a href="">测试3</a></dd>-->
+                <!--</dl>-->
+            <!--</li>-->
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="__PUBLIC__/favicon.ico" class="layui-nav-img">
+                    {$current_user['name']}
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" id="setmypassword">修改密码</a></dd>
+                    <dd><a href="javascript:;" id="mysetting">账号设置</a></dd>
+                    <dd><a href="/outlogin">退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <!-- header end -->
+
+    <!-- left-nav -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree manage_left_nav">
+
+                <volist name="left_nav" id="l_nav">
+                    <!-- layui-nav-itemed -->
+                    <li class="layui-nav-item <if condition="$l_nav['selected'] == 1">layui-nav-itemed</if>">
+                        <a href="{$l_nav.uri}">{$l_nav.name}</a>
+                        <dl class="layui-nav-child">
+                            <volist name="l_nav.child" id="child_nav">
+                                <dd <if condition="$child_nav['selected'] == 1">class="layui-this"</if>><a href="{$child_nav.uri}">{$child_nav.name}</a></dd>
+                            </volist>
+                        </dl>
+                    </li>
+                </volist>
+
+            </ul>
+        </div>
+    </div>
+    <!-- left-nav end -->
+
+    <!-- main -->
+    <div class="layui-body">
+        <div class="xy_body layui-anim layui-anim-upbit">
+            <block name="content">
+                <!-- 主题内容区域 -->
+            </block>
+        </div>
+    </div>
+    <!-- main end -->
+
+    <!-- footer -->
+    <div class="layui-footer">
+        {$site_info.footer_text}
+    </div>
+    <!-- footer end -->
+
+</div>
+
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="__PUBLIC__/layui/layui.js"></script>
+<script>// JavaScript代码区域
+layui.use(['element','layer'], function () {
+    var element = layui.element;
+
+});
+
+// 修改个人资料
+$('#mysetting').click(function () {
+
+    // 获取当前登录用户的id
+    var edit_id = "{: session('_manager')['id'] }";
+
+    // 弹出修改个人资料页面
+    showBox('编辑','/mysetting?id='+edit_id,50,70);
+
+});
+
+// 修改密码
+$('#setmypassword').click(function () {
+
+    // 获取当前登录用户的id
+    var edit_id = "{: session('_manager')['id'] }";
+
+    // 弹出修改个人资料页面
+    showBox('修改密码','/setmypassword?id='+edit_id,30,30);
+
+});
+
+/*弹出层*/
+/*
+    参数解释：
+    title   标题
+    url     请求的url
+    id      需要操作的数据id
+    w       弹出层宽度（缺省调默认值）
+    h       弹出层高度（缺省调默认值）
+*/
+function showBox(title,url,w,h){
+    if (title == null || title == '') {
+        title=false;
+    };
+    if (url == null || url == '') {
+        url="404.html";
+    };
+    if (w == null || w == '') {
+        w=($(window).width()*0.9);
+    };
+    if (h == null || h == '') {
+        h=($(window).height() - 50);
+    };
+    layer.open({
+        type: 2,
+        // area: [w+'px', h +'px'],
+        area: [w+'%', h +'%'],
+        fix: false, //不固定
+        // maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url
+    });
+}
+
+</script>
+</html>
