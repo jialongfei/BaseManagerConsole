@@ -28,7 +28,7 @@ class BaseController extends Controller
         }else{
             $this->getAllLeftNav();// 跳过权限,获取所有左侧导航
         }
-
+        
         $this->site_init();// 获取基本配置信息
     }
 
@@ -155,7 +155,7 @@ class BaseController extends Controller
     public function site_init()
     {
         $site_info = M('base_setting')->find(1);
-        $this->current_user = session('xy_manager');
+        $this->current_user = session('_manager');
         $this->site_info = $site_info;
     }
 

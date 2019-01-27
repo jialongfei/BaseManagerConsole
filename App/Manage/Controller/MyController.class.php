@@ -12,7 +12,7 @@ namespace Manage\Controller;
 use Manage\Model\UserModel;
 use Think\Controller;
 
-class MyController extends Controller
+class MyController extends BaseController
 {
     public function mysetting()
     {
@@ -23,7 +23,7 @@ class MyController extends Controller
             if (!$par['id']) $this->ajaxReturn(['status'=>false,'msg'=>'缺少关键参数']);// 缺少关键参数
 
             if (!$par['name']) $this->ajaxReturn(['status'=>false,'msg'=>'用户名不能为空']);// 参数过滤
-
+            
             // 获取原始数据
             $before_data = (new UserModel())->find($par['id']);
 
@@ -34,7 +34,10 @@ class MyController extends Controller
             {
                 if ((new UserModel())->where(['name'=>['eq',$par['name']]])->select()) $this->ajaxReturn(['status'=>false,'msg'=>'用户名已存在!']);
             }
-
+            
+            // 初始账号过滤状态字段
+            if ($before_data['status'] == 9) unset($par['status']);
+            
             // TODO validate...
 
             // 执行更新操作
@@ -43,6 +46,9 @@ class MyController extends Controller
             }catch (\Exception $exception){
                 $this->ajaxReturn(['status'=>false,'msg'=>$exception->getMessage()]);// 捕获异常
             }
+
+            $new_user_info = (new UserModel())->find($par['id']);
+            session('_manager',$new_user_info);
 
             $this->ajaxReturn(['status'=>true,'msg'=>'修改成功!']);// 更新成功
         }

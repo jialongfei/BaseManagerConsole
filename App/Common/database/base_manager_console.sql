@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50717
+Source Server         : 本地
+Source Server Version : 50553
 Source Host           : localhost:3306
 Source Database       : base_manager_console
 
 Target Server Type    : MYSQL
-Target Server Version : 50717
+Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-08-01 09:29:12
+Date: 2019-01-27 16:29:03
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -46,7 +46,7 @@ CREATE TABLE `premission` (
   `create_time` int(11) unsigned NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8 COMMENT='权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8 COMMENT='权限表';
 
 -- ----------------------------
 -- Records of premission
@@ -103,6 +103,28 @@ CREATE TABLE `role_pre` (
 -- ----------------------------
 -- Records of role_pre
 -- ----------------------------
+INSERT INTO `role_pre` VALUES ('5', '1');
+INSERT INTO `role_pre` VALUES ('5', '1');
+INSERT INTO `role_pre` VALUES ('5', '2');
+INSERT INTO `role_pre` VALUES ('5', '2');
+INSERT INTO `role_pre` VALUES ('5', '3');
+INSERT INTO `role_pre` VALUES ('5', '4');
+INSERT INTO `role_pre` VALUES ('5', '5');
+INSERT INTO `role_pre` VALUES ('5', '6');
+INSERT INTO `role_pre` VALUES ('5', '28');
+INSERT INTO `role_pre` VALUES ('5', '29');
+INSERT INTO `role_pre` VALUES ('5', '7');
+INSERT INTO `role_pre` VALUES ('5', '8');
+INSERT INTO `role_pre` VALUES ('5', '9');
+INSERT INTO `role_pre` VALUES ('5', '10');
+INSERT INTO `role_pre` VALUES ('5', '32');
+INSERT INTO `role_pre` VALUES ('5', '11');
+INSERT INTO `role_pre` VALUES ('5', '12');
+INSERT INTO `role_pre` VALUES ('5', '13');
+INSERT INTO `role_pre` VALUES ('5', '14');
+INSERT INTO `role_pre` VALUES ('5', '15');
+INSERT INTO `role_pre` VALUES ('5', '15');
+INSERT INTO `role_pre` VALUES ('5', '16');
 
 -- ----------------------------
 -- Table structure for `user`
@@ -123,12 +145,12 @@ CREATE TABLE `user` (
   `avatar` varchar(100) DEFAULT '0' COMMENT '头像',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'dragon', 'dragon Jia', '15988805856', 'jialongfeicn@gmail.com', '64e702d799692a0d0029c3fa7a299da8', '127.0.0.1', '1533085956', '1', '1531720576', '1', './Uploads/img/2018-07-31/5b602e92ab05e.jpg');
+INSERT INTO `user` VALUES ('1', 'dragon', 'dragon Jia', '15988805856', 'jialongfeicn@gmail.com', '64e702d799692a0d0029c3fa7a299da8', '127.0.0.1', '1548575051', '1', '1531720576', '9', './Uploads/img/2019-01-27/5c4d5aea39ddb.jpg');
 
 -- ----------------------------
 -- Table structure for `user_role`

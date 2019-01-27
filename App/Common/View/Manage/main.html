@@ -28,7 +28,7 @@
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
                 <a href="javascript:;">
-                    <img src="__PUBLIC__/favicon.ico" class="layui-nav-img">
+                    <img src="{$current_user['avatar']|default='__PUBLIC__/favicon.ico'}" class="layui-nav-img">
                     {$current_user['name']}
                 </a>
                 <dl class="layui-nav-child">

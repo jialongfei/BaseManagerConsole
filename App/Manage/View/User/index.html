@@ -57,7 +57,7 @@
                     cols: [[ // 表头 (列显示)
                         {type:'checkbox',fixed: 'left'},
                         // {field: 'id', title: 'ID', sort: true},
-                        {field: 'avatar', title: '头像',templet: '#tableimg'},
+                        {field: 'avatar', title: '头像',templet: '#tableimg',width:100},
                         {field: 'name', title: '昵称'},
                         {field: 'role_name', title: '角色'},
                         {field: 'phone', title: '手机号'},
@@ -101,7 +101,20 @@
                 // -------------------- 数据操作 --------------------
                 // 监听表格复选框选择
                 table.on('checkbox(data)', function(obj){
-                    // console.log(obj)
+                    console.log(obj)
+                    if (obj.data.status == 9 && obj.checked == true) {
+                        layer.alert('不可操作系统用户！');
+                        $('#check_ids').val('');// 清空暂存的ids
+                        $('#tool_bar').hide();// 隐藏操作工具栏
+                        return false;
+                    }
+
+                    if (obj.type == 'all' && obj.checked == true) {
+                        // 用户禁止全选操作
+                        window.location.reload();
+                        return false;
+                    }
+
                     // 获取当前选中元素
                     var checkStatus = table.checkStatus('lists')
                         ,data = checkStatus.data;
@@ -244,7 +257,7 @@
     <!-- 图片模板 -->
     <script type="text/html" id="tableimg">
         {{#  if(d.avatar!=0){ }}
-        <img src="{{ d.avatar }}" alt="{{ d.avatar }}">
+        <img src="{{ d.avatar }}" style="width: 28px;height: 28px;" alt="{{ d.avatar }}">
         {{#  } else { }}
         <font class="status_false">头像未上传</font>
         {{#  } }}

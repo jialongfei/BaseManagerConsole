@@ -68,12 +68,14 @@
                 <input value="{$info.email}" type="text" id="email" name="email" autocomplete="off" class="layui-input">
             </div>
         </div>
-        <div class="layui-form-item">
-            <label for="status" class="layui-form-label">状态</label>
-            <div class="layui-input-inline">
-                <input type="checkbox" id="status" name="status" lay-skin="switch" lay-text="ON|OFF" <if condition="$info['status'] == 1">checked</if> >
+        <if condition="$current_user.status neq 9">
+            <div class="layui-form-item">
+                <label for="status" class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <input type="checkbox" id="status" name="status" lay-skin="switch" lay-text="ON|OFF" <if condition="$info['status'] == 1">checked</if> >
+                </div>
             </div>
-        </div>
+        </if>
         <!-- TODO 1 如果提交按钮需要提取到外面 删除下面的 layui-form-item div -->
         <div class="layui-form-item">
             <label class="layui-form-label"> </label>

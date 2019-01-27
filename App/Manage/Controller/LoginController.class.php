@@ -50,7 +50,7 @@ class LoginController extends Controller
     {
         $password = md5(md5('dragon-'.$data['password']));// 密码处理
 
-        $need_field = 'id,name,true_name,phone,email,status';// 要查询的字段
+        $need_field = 'id,name,true_name,phone,email,avatar,status';// 要查询的字段
 
         $user = (new UserModel())->field($need_field)->where(['name'=>['eq',$data['name']],'password'=>['eq',$password]])->find();// 密码匹配
 
